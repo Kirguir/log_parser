@@ -1,0 +1,11 @@
+{
+    "name": "kirguir/log-analyzer",
+    "description": "Log analyzer",
+    "config": {
+        "process-timeout": 600
+    },
+    "require": {
+        "yiisoft/yii": "1.1.*",
+        "2amigos/yiiwheels": "dev-master"
+    }
+}

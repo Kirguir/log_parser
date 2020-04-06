@@ -1,0 +1,6 @@
+.idea
+/src/protected/runtime/*
+/src/assets/*
+/vendor
+/log
+.env
