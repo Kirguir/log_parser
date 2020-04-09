@@ -10,14 +10,32 @@ class Controller extends CController
 	 * meaning using a single column layout. See 'protected/views/layouts/column1.php'.
 	 */
 	public $layout='//layouts/column1';
-	/**
-	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
-	 */
-	public $menu=array();
-	/**
-	 * @var array the breadcrumbs of the current page. The value of this property will
-	 * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
-	 * for more details on how to specify this property.
-	 */
-	public $breadcrumbs=array();
+    /**
+     * @var array context menu items. This property will be assigned to {@link CMenu::items}.
+     */
+    public $menu = array();
+    /**
+     * @var array the breadcrumbs of the current page. The value of this property will
+     * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
+     * for more details on how to specify this property.
+     */
+    public $breadcrumbs = array();
+
+    public function isAPIRequest()
+    {
+        return strpos($_SERVER['REQUEST_URI'], '/api/') !== false;
+    }
+
+    protected function sendAjaxResponse(AjaxResponseInterface $model)
+    {
+        $success = count($model->getErrors()) === 0;
+        $response_code = $success ? 200 : 404;
+        header('Content-type: application/json', true, $response_code);
+        echo json_encode([
+            'success' => $success,
+            'data' => $model->getResponseData(),
+            'errors' => $model->getErrors(),
+        ]);
+        Yii::app()->end();
+    }
 }
