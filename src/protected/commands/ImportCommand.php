@@ -6,16 +6,36 @@
 class ImportCommand extends CConsoleCommand
 {
     /**
-     * Path to dir with 'access.log`.
+     * Path to dir with log files.
      *
      * @var string
      */
     public $path = '';
 
-    public function actionIndex($path = null)
+    /**
+     * Pattern for logs filename.
+     *
+     * @var string
+     */
+    public $pattern = '/^access\.log$/i';
+
+    public function actionIndex($path = null, $pattern = null)
     {
-        $file = ($path ?? $this->path) . '/access.log';
-        $logs = fopen($file, 'r') or exit($php_errormsg);
+        $path = $path ?? $this->path;
+        $pattern = $pattern ?? $this->pattern;
+        $logs = [];
+        $dh = opendir($path) or exit($php_errormsg);
+        if ($dh) {
+            while (($filename = readdir($dh)) !== false) {
+                if (preg_match($pattern, $filename)) {
+                    $logs[] = $filename;
+                }
+            }
+            closedir($dh);
+        }
+        if (empty($logs)) {
+            return 0;
+        }
 
         $command = Yii::app()->db->createCommand();
         $last = $command->select('time')
@@ -26,14 +46,20 @@ class ImportCommand extends CConsoleCommand
         $last_time = strtotime($last['time']);
 
         $parser = new LogParser();
-        while (!feof($logs)) {
-            $line = trim(fgets($logs));
-            if (!empty($statistic = $parser->parse($line))) {
-                if (strtotime($statistic['time']) > $last_time) {
-                    $command->reset();
-                    $command->insert('tbl_statistic', $statistic);
+        foreach ($logs as $log) {
+            $fh = fopen($path . $log, 'r') or exit($php_errormsg);
+            while (!feof($fh)) {
+                $line = trim(fgets($fh));
+                if (!empty($statistic = $parser->parse($line))) {
+                    if (strtotime($statistic['time']) > $last_time) {
+                        $command->reset();
+                        $command->insert('tbl_statistic', $statistic);
+                    }
                 }
             }
+            fclose($fh);
         }
+
+        return 0;
     }
 }

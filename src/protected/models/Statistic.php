@@ -48,16 +48,8 @@ class Statistic extends CActiveRecord implements AjaxResponseInterface
      */
     public function rules()
     {
-        // NOTE: you should only define rules for those attributes that
-        // will receive user inputs.
         return array(
-            //array('remote_host, time, method, request, protocol, status, bytes, user_agent', 'required'),
-            //array('status, bytes', 'numerical', 'integerOnly'=>true),
-            //array('remote_host', 'length', 'max'=>11),
-            //array('remote_user, method, protocol, referer, user_agent', 'length', 'max'=>255),
-            // The following rule is used by search().
             array('remote_host, time_from, time_to, method, status, group_by', 'safe', 'on' => 'search'),
-            //array('time_from, time_to, method, status', 'default', 'setOnEmpty' => true, 'value' => null),
         );
     }
 

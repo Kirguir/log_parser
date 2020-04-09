@@ -34,7 +34,8 @@ return array(
     'commandMap' => [
         'import' => [
             'class' => 'application.commands.ImportCommand',
-            'path' => '/var/www/log'
+            'path' => '/var/www/log/',
+            'pattern' => '/^access[0-9]{0,4}\.log$/i'
         ]
     ]
 );
